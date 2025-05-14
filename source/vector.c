@@ -226,3 +226,33 @@ void* vector_shrink_to_fit(void *vector)
 
     return new_vec;
 }
+
+void* vector_normal_copy(void* vector, void* (*malloc_fn)(size_t))
+{
+    if (!vector)
+    {
+        VECTOR_DEBUG_PERROR("Vector Normal Copy: given null vector.\n");
+        return NULL;
+    }
+    if (!malloc_fn)
+    {
+        VECTOR_DEBUG_PERROR("Vector Normal Copy: given null malloc function.\n");
+        return NULL;
+    }
+
+    VectorHeader* hdr = VECTOR_HEADER(vector);
+
+    size_t total_size = hdr->len * hdr->tsize;
+    if (total_size == 0)
+        return NULL;
+
+    void* raw = malloc_fn(total_size);
+    if (!raw)
+    {
+        VECTOR_DEBUG_PERROR("Vector Normal Copy: malloc failed.\n");
+        return NULL;
+    }
+
+    memcpy(raw, vector, total_size);
+    return raw;
+}

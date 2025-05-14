@@ -174,4 +174,13 @@ int vector_remove(void *vector, size_t index);
  */
 int vector_remove_ordered(void *vector, size_t index);
 
+/**
+ * @brief Copies the vector contents into a normal C array (no header).
+ *
+ * @param vector Vector pointer.
+ * @param malloc_fn malloc-like function for allocating the array.
+ * @return Pointer to plain array or NULL on failure.
+ */
+void *vector_normal_copy(void *vector, void *(*malloc_fn)(size_t));
+
 #endif /* _VECTOR_H */

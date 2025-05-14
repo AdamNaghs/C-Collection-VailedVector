@@ -244,21 +244,22 @@ void *vector_resize(void *vector, size_t cap)
 }
 
 /* Pop back: reduce length and return pointer to popped item */
-void *vector_pop_back(void *vector)
+VectorStatus vector_pop_back(void *vector, void* out)
 {
-    if (!vector)
+    if (!vector || !out)
     {
-        VECTOR_DEBUG_PERROR("Vector Pop Back: given null vector.\n");
-        return NULL;
+        VECTOR_DEBUG_PERROR("Vector Pop Back: given null vector or out.\n");
+        return VEC_ERR;
     }
     VectorHeader *hdr = VECTOR_HEADER(vector);
     if (hdr->len == 0)
     {
         VECTOR_DEBUG_PERROR("Vector Pop Back: empty vector.\n");
-        return NULL;
+        return VEC_EMPTY;
     }
     hdr->len--;
-    return (byte_t *)vector + (hdr->len * hdr->tsize);
+    memcpy(out,(byte_t *)vector + (hdr->len * hdr->tsize),hdr->tsize);
+    return VEC_OK;
 }
 
 const char* vector_status_to_string(VectorStatus status)

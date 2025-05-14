@@ -11,6 +11,7 @@ typedef enum
     VEC_OK = 0,
     VEC_ERR,
     VEC_FULL,
+    VEC_EMPTY,
     VEC_INDEX_OOB
 } VectorStatus;
 
@@ -181,14 +182,12 @@ VectorStatus vector_remove(void *vector, size_t index);
 VectorStatus vector_remove_ordered(void *vector, size_t index);
 
 /**
- * @brief Pop the last element from the vector.
- *
- * @warning Do not keep the returned pointer alive for long; it may become invalid after further vector operations.
- *
- * @param vector Vector pointer.
- * @return Pointer to the popped element, or NULL if vector is empty or null.
+ * @brief Construct a new Vector Status object
+ * 
+ * @param vector Vector pointer
+ * @param out Reference to copy pop value to.
  */
-void *vector_pop_back(void *vector);
+VectorStatus vector_pop_back(void *vector, void* out);
 
 /**
  * @brief Copies the vector contents into a normal C array (no header).

@@ -56,9 +56,9 @@ int test_pop_back(void)
     vector_push_back(vec, 100);
     vector_push_back(vec, 200);
     vector_push_back(vec, 300);
-
-    int *popped = vector_pop_back(vec);
-    if (!popped || *popped != 300)
+    int popped;
+    vector_pop_back(vec,&popped);
+    if (popped != 300)
         return 1;
 
     size_t len;
@@ -67,8 +67,8 @@ int test_pop_back(void)
     if (len != 2)
         return 1;
 
-    popped = vector_pop_back(vec);
-    if (!popped || *popped != 200)
+    vector_pop_back(vec,&popped);
+    if (popped != 200)
         return 1;
 
     if (vector_get_len(vec, &len) != 0)

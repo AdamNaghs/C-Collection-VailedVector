@@ -28,8 +28,8 @@ void *vector_init(size_t tsize, size_t cap, Allocator *a)
         VECTOR_DEBUG_PERROR("Vector Init: allocation failed.\n");
         return NULL;
     }
-    VectorHeader *tmp = ret;
-    *tmp = h;
+    VectorHeader *hdr = ret;
+    *hdr = h;
     return (byte_t *)ret + sizeof(h);
 }
 
@@ -41,13 +41,13 @@ int vector_free(void *vector)
         VECTOR_DEBUG_PERROR("Vector Free: given null vector.\n");
         return 1;
     }
-    VectorHeader *tmp = VECTOR_HEADER(vector);
-    if (!tmp->a)
+    VectorHeader *hdr = VECTOR_HEADER(vector);
+    if (!hdr->a)
     {
         VECTOR_DEBUG_PERROR("Vector Free: null allocator in header.\n");
         return 1;
     }
-    tmp->a->free(tmp);
+    hdr->a->free(hdr);
     return 0;
 }
 
@@ -59,8 +59,8 @@ int vector_can_append(void *vector)
         VECTOR_DEBUG_PERROR("Vector Can Append: given null vector.\n");
         return 0;
     }
-    VectorHeader *tmp = VECTOR_HEADER(vector);
-    return tmp->cap > tmp->len;
+    VectorHeader *hdr = VECTOR_HEADER(vector);
+    return hdr->cap > hdr->len;
 }
 
 /* Get vector capacity */
@@ -76,8 +76,8 @@ int vector_get_cap(void *vector, size_t *out)
         VECTOR_DEBUG_PERROR("Vector Get Cap: given null output pointer.\n");
         return 1;
     }
-    VectorHeader *tmp = VECTOR_HEADER(vector);
-    *out = tmp->cap;
+    VectorHeader *hdr = VECTOR_HEADER(vector);
+    *out = hdr->cap;
     return 0;
 }
 
@@ -94,8 +94,8 @@ int vector_get_len(void *vector, size_t *out)
         VECTOR_DEBUG_PERROR("Vector Get Len: given null output pointer.\n");
         return 1;
     }
-    VectorHeader *tmp = VECTOR_HEADER(vector);
-    *out = tmp->len;
+    VectorHeader *hdr = VECTOR_HEADER(vector);
+    *out = hdr->len;
     return 0;
 }
 
@@ -107,8 +107,8 @@ int vector_set_len(void *vector, size_t len)
         VECTOR_DEBUG_PERROR("Vector Set Len: given null vector.\n");
         return 1;
     }
-    VectorHeader *tmp = VECTOR_HEADER(vector);
-    tmp->len = len;
+    VectorHeader *hdr = VECTOR_HEADER(vector);
+    hdr->len = len;
     return 0;
 }
 
@@ -120,13 +120,13 @@ void *vector_resize(void *vector, size_t cap)
         VECTOR_DEBUG_PERROR("Vector Resize: given null vector.\n");
         return NULL;
     }
-    VectorHeader *tmp = VECTOR_HEADER(vector);
-    if (!tmp->a)
+    VectorHeader *hdr = VECTOR_HEADER(vector);
+    if (!hdr->a)
     {
         VECTOR_DEBUG_PERROR("Vector Resize: null allocator in header.\n");
         return NULL;
     }
-    VectorHeader *new_vector = tmp->a->realloc(tmp, cap * tmp->tsize + sizeof(VectorHeader));
+    VectorHeader *new_vector = hdr->a->realloc(hdr, cap * hdr->tsize + sizeof(VectorHeader));
     if (!new_vector)
     {
         VECTOR_DEBUG_PERROR("Vector Resize: realloc failed.\n");

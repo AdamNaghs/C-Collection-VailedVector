@@ -99,6 +99,16 @@ typedef struct Allocator
 
 #define vector_shrink(v) ((v) = vector_shrink_to_fit(v))
 
+#define vector_foreach(T, v, var)                                                                                   \
+    for (size_t _i = 0, _len = 0;                                                                                   \
+         (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
+         ++_i)
+
+#define vector_foreach_ansi(_i, _len, T, v, var)                                                                    \
+    for (_i = 0, _len = 0;                                                                                          \
+         (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
+         ++_i)
+
 /**
  * @brief Initialize a vector.
  *
@@ -144,7 +154,7 @@ VectorStatus vector_get_cap(void *vector, size_t *out);
 VectorStatus vector_get_len(void *vector, size_t *out);
 
 /**
- * @brief Set the length of the vector.
+ * @brief Set the length of the vector. Doesn't do bounds checking. Feel free to ignore, its just used by a macro.
  *
  * @param vector Vector pointer.
  * @param len New length.

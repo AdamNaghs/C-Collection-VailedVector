@@ -230,7 +230,7 @@ int test_remove_ordered(void)
     return 0;
 }
 
-int test_vector_of_vectors(void)
+int test_vector_of_dyn(void)
 {
     Allocator a = {malloc, realloc, free};
 
@@ -281,11 +281,72 @@ int test_vector_of_vectors(void)
     return 0;
 }
 
+int test_vector_of_vectors(void)
+{
+    Allocator a = {malloc, realloc, free};
+
+    typedef int *IntVector;
+    IntVector *vec = vector(IntVector, &a);
+    if (!vec)
+        return 1;
+
+    // Create a few inner VECTORS manually
+    for (int i = 0; i < 3; ++i)
+    {
+        int *inner = vector(int, &a);
+        if (!inner)
+            return 1;
+
+        for (int j = 0; j < 4; ++j)
+        {
+            vector_push_back(inner, i * 10 + j);
+        }
+
+        vector_push_back(vec, inner);
+    }
+
+    // Verify
+    size_t len;
+    if (vector_get_len(vec, &len) != 0)
+        return 1;
+    if (len != 3)
+        return 1;
+
+    for (size_t i = 0; i < len; ++i)
+    {
+        size_t inner_len;
+        if (vector_get_len(vec[i], &inner_len) != 0)
+            return 1;
+        if (inner_len != 4)
+            return 1;
+
+        for (size_t j = 0; j < inner_len; ++j)
+        {
+            if (vec[i][j] != (int)(i * 10 + j))
+            {
+                printf("Failed Vector of Vectors test at [%zu][%zu]\n", i, j);
+                return 1;
+            }
+        }
+    }
+
+    // Free inner vectors
+    for (size_t i = 0; i < len; ++i)
+    {
+        vector_free(vec[i]);
+    }
+
+    // Free outer vector
+    vector_free(vec);
+
+    return 0;
+}
+
 // -------- Main Test Runner --------
 
 int main(void)
 {
-    int total = 10;
+    int total = 11;
     int score = 0;
 
     score += (test_init_free() == 0);
@@ -297,6 +358,7 @@ int main(void)
     score += (test_set_len() == 0);
     score += (test_remove() == 0);
     score += (test_remove_ordered() == 0);
+    score += (test_vector_of_dyn() == 0);
     score += (test_vector_of_vectors() == 0);
 
     printf("%d/%d tests passed.\n", score, total);

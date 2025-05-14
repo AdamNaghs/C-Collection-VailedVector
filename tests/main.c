@@ -1,5 +1,5 @@
 #define VECTOR_DEBUG
-#include "../vector/vector.h"
+#include "../source/vector.h"Z
 
 #include <stdio.h>
 #include <stdlib.h> // for malloc, realloc, free

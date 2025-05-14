@@ -182,7 +182,7 @@ VectorStatus vector_remove(void *vector, size_t index);
 VectorStatus vector_remove_ordered(void *vector, size_t index);
 
 /**
- * @brief Construct a new Vector Status object
+ * @brief Copies removes last value from vector and copies it to out.
  * 
  * @param vector Vector pointer
  * @param out Reference to copy pop value to.

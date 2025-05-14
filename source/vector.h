@@ -98,6 +98,37 @@ typedef struct Allocator
         }                                                           \
     } while (0)
 
+#define vector_insert(v, index, item)                                               \
+    do                                                                              \
+    {                                                                               \
+        if (!(v))                                                                   \
+        {                                                                           \
+            VECTOR_DEBUG_PERROR("Vector Insert: given null.\n");                    \
+            break;                                                                  \
+        }                                                                           \
+        size_t _len, _cap;                                                          \
+        vector_get_cap(v, &_cap);                                                   \
+        vector_get_len(v, &_len);                                                   \
+        if ((index) > _len)                                                         \
+        {                                                                           \
+            VECTOR_DEBUG_PERROR("Vector Insert: index out of bounds.\n");           \
+            break;                                                                  \
+        }                                                                           \
+        if (vector_can_append(v) != VEC_OK)                                         \
+        {                                                                           \
+            void *_tmp = vector_resize(v, (_cap + 1) * 2);                          \
+            if (!_tmp)                                                              \
+            {                                                                       \
+                VECTOR_DEBUG_PERROR("Vector Insert: resize failed.\n");             \
+                break;                                                              \
+            }                                                                       \
+            (v) = _tmp;                                                             \
+        }                                                                           \
+        memmove(&(v)[(index) + 1], &(v)[(index)], (_len - (index)) * sizeof(*(v))); \
+        (v)[(index)] = (item);                                                      \
+        vector_set_len(v, _len + 1);                                                \
+    } while (0)
+
 #define vector_shrink(v) ((v) = vector_shrink_to_fit(v))
 
 #define vector_foreach(T, v, var)                                                                                   \
@@ -183,11 +214,11 @@ VectorStatus vector_remove_ordered(void *vector, size_t index);
 
 /**
  * @brief Copies removes last value from vector and copies it to out.
- * 
+ *
  * @param vector Vector pointer
  * @param out Reference to copy pop value to.
  */
-VectorStatus vector_pop_back(void *vector, void* out);
+VectorStatus vector_pop_back(void *vector, void *out);
 
 /**
  * @brief Copies the vector contents into a normal C array (no header).

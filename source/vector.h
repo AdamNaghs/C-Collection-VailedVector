@@ -74,6 +74,8 @@ typedef struct Allocator
         vector_set_len(v, _len);                                           \
     } while (0)
 
+#define vector_shrink(v) ((v) = vector_shrink_to_fit(v))
+
 /**
  * @brief Initialize a vector.
  *
@@ -152,7 +154,7 @@ void *vector_resize(void *vector, size_t cap);
  * @param vector Reference to Vector pointer.
  * @return 0 on success, 1 on error.
  */
-void* vector_shrink_to_fit(void *vector_ptr);
+void *vector_shrink_to_fit(void *vector_ptr);
 
 /**
  * @brief Remove index from vector. Doesn't respect order.
@@ -171,6 +173,5 @@ int vector_remove(void *vector, size_t index);
  * @return 0 on success, 1 on error.
  */
 int vector_remove_ordered(void *vector, size_t index);
-
 
 #endif /* _VECTOR_H */

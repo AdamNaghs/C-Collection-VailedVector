@@ -18,7 +18,7 @@ int test_init_free(void)
     return 0;
 }
 
-int test_append0(void)
+int test_append(void)
 {
     Allocator a = {malloc, realloc, free};
     int *vec = vector(int, &a);
@@ -363,7 +363,7 @@ int main(void)
     int score = 0;
 
     score += (test_init_free() == 0);
-    score += (test_append0() == 0);
+    score += (test_append() == 0);
     score += (test_pop_back() == 0);
     score += (test_resize() == 0);
     score += (test_can_append() == 0);

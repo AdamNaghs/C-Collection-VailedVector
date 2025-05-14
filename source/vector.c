@@ -172,7 +172,7 @@ int vector_remove(void *vector, size_t index)
 
     if (hdr->len > 1 && index != hdr->len - 1)
     {
-        /* Move entire tail of the array forward one space */
+        /* Move entire tail of the array backward one space */
         memmove((byte_t *)vector + hdr->tsize * index,
                 (byte_t *)vector + hdr->tsize * (index + 1),
                 (hdr->len - index - 1) * hdr->tsize);

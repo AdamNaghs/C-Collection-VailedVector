@@ -8,30 +8,39 @@
 
 int test_init_free(void)
 {
-    Allocator a = { malloc, realloc, free };
-    int* vec = vector(int, &a);
-    if (!vec) return 1;
-    if (vector_free(vec) != 0) return 1;
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
+    VECTOR_VALIDATE(vec);
+    if (vector_free(vec) != 0)
+        return 1;
     return 0;
 }
 
 int test_append0(void)
 {
-    Allocator a = { malloc, realloc, free };
-    int* vec = vector(int, &a);
-    if (!vec) return 1;
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
 
     vector_push_back(vec, 10);
     vector_push_back(vec, 20);
     vector_push_back(vec, 30);
 
     size_t len;
-    if (vector_get_len(vec, &len) != 0) return 1;
-    if (len != 3) return 1;
+    if (vector_get_len(vec, &len) != 0)
+        return 1;
+    if (len != 3)
+        return 1;
 
-    if (vec[0] != 10) return 1;
-    if (vec[1] != 20) return 1;
-    if (vec[2] != 30) return 1;
+    if (vec[0] != 10)
+        return 1;
+    if (vec[1] != 20)
+        return 1;
+    if (vec[2] != 30)
+        return 1;
 
     vector_free(vec);
     return 0;
@@ -39,26 +48,33 @@ int test_append0(void)
 
 int test_pop_back(void)
 {
-    Allocator a = { malloc, realloc, free };
-    int* vec = vector(int, &a);
-    if (!vec) return 1;
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
 
     vector_push_back(vec, 100);
     vector_push_back(vec, 200);
     vector_push_back(vec, 300);
 
-    int* popped = vector_pop_back(vec);
-    if (!popped || *popped != 300) return 1;
+    int *popped = vector_pop_back(vec);
+    if (!popped || *popped != 300)
+        return 1;
 
     size_t len;
-    if (vector_get_len(vec, &len) != 0) return 1;
-    if (len != 2) return 1;
+    if (vector_get_len(vec, &len) != 0)
+        return 1;
+    if (len != 2)
+        return 1;
 
     popped = vector_pop_back(vec);
-    if (!popped || *popped != 200) return 1;
+    if (!popped || *popped != 200)
+        return 1;
 
-    if (vector_get_len(vec, &len) != 0) return 1;
-    if (len != 1) return 1;
+    if (vector_get_len(vec, &len) != 0)
+        return 1;
+    if (len != 1)
+        return 1;
 
     vector_free(vec);
     return 0;
@@ -66,9 +82,10 @@ int test_pop_back(void)
 
 int test_resize(void)
 {
-    Allocator a = { malloc, realloc, free };
-    int* vec = vector(int, &a);
-    if (!vec) return 1;
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
 
     for (int i = 0; i < 1000; ++i)
     {
@@ -76,12 +93,15 @@ int test_resize(void)
     }
 
     size_t len;
-    if (vector_get_len(vec, &len) != 0) return 1;
-    if (len != 1000) return 1;
+    if (vector_get_len(vec, &len) != 0)
+        return 1;
+    if (len != 1000)
+        return 1;
 
     for (int i = 0; i < 1000; ++i)
     {
-        if (vec[i] != i) return 1;
+        if (vec[i] != i)
+            return 1;
     }
 
     vector_free(vec);
@@ -90,9 +110,10 @@ int test_resize(void)
 
 int test_can_append(void)
 {
-    Allocator a = { malloc, realloc, free };
-    int* vec = vector(int, &a);
-    if (!vec) return 1;
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
 
     for (int i = 0; i < VECTOR_DEFAULT_CAP; ++i)
     {
@@ -103,7 +124,8 @@ int test_can_append(void)
         return 1;
 
     vec = vector_resize(vec, VECTOR_DEFAULT_CAP * 2);
-    if (!vec) return 1;
+    if (!vec)
+        return 1;
 
     if (vector_can_append(vec) != 1) // Should have space now
         return 1;
@@ -114,13 +136,16 @@ int test_can_append(void)
 
 int test_get_cap(void)
 {
-    Allocator a = { malloc, realloc, free };
-    int* vec = vector(int, &a);
-    if (!vec) return 1;
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
 
     size_t cap;
-    if (vector_get_cap(vec, &cap) != 0) return 1;
-    if (cap != VECTOR_DEFAULT_CAP) return 1;
+    if (vector_get_cap(vec, &cap) != 0)
+        return 1;
+    if (cap != VECTOR_DEFAULT_CAP)
+        return 1;
 
     vector_free(vec);
     return 0;
@@ -128,15 +153,19 @@ int test_get_cap(void)
 
 int test_set_len(void)
 {
-    Allocator a = { malloc, realloc, free };
-    int* vec = vector(int, &a);
-    if (!vec) return 1;
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
 
-    if (vector_set_len(vec, 10) != 0) return 1;
+    if (vector_set_len(vec, 10) != 0)
+        return 1;
 
     size_t len;
-    if (vector_get_len(vec, &len) != 0) return 1;
-    if (len != 10) return 1;
+    if (vector_get_len(vec, &len) != 0)
+        return 1;
+    if (len != 10)
+        return 1;
 
     vector_free(vec);
     return 0;
@@ -144,23 +173,29 @@ int test_set_len(void)
 
 int test_remove(void)
 {
-    Allocator a = { malloc, realloc, free };
-    int* vec = vector(int, &a);
-    if (!vec) return 1;
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
 
     vector_push_back(vec, 1);
     vector_push_back(vec, 2);
     vector_push_back(vec, 3);
 
-    if (vector_remove(vec, 1) != 0) return 1;
+    if (vector_remove(vec, 1) != 0)
+        return 1;
 
     size_t len;
-    if (vector_get_len(vec, &len) != 0) return 1;
-    if (len != 2) return 1;
+    if (vector_get_len(vec, &len) != 0)
+        return 1;
+    if (len != 2)
+        return 1;
 
     // Unordered remove, so the second element can be anything from original 1 or 3
-    if (vec[0] != 1 && vec[0] != 3) return 1;
-    if (vec[1] != 1 && vec[1] != 3) return 1;
+    if (vec[0] != 1 && vec[0] != 3)
+        return 1;
+    if (vec[1] != 1 && vec[1] != 3)
+        return 1;
 
     vector_free(vec);
     return 0;
@@ -168,22 +203,28 @@ int test_remove(void)
 
 int test_remove_ordered(void)
 {
-    Allocator a = { malloc, realloc, free };
-    int* vec = vector(int, &a);
-    if (!vec) return 1;
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
 
     vector_push_back(vec, 5);
     vector_push_back(vec, 6);
     vector_push_back(vec, 7);
 
-    if (vector_remove_ordered(vec, 1) != 0) return 1;
+    if (vector_remove_ordered(vec, 1) != 0)
+        return 1;
 
     size_t len;
-    if (vector_get_len(vec, &len) != 0) return 1;
-    if (len != 2) return 1;
+    if (vector_get_len(vec, &len) != 0)
+        return 1;
+    if (len != 2)
+        return 1;
 
-    if (vec[0] != 5) return 1;
-    if (vec[1] != 7) return 1;
+    if (vec[0] != 5)
+        return 1;
+    if (vec[1] != 7)
+        return 1;
 
     vector_free(vec);
     return 0;

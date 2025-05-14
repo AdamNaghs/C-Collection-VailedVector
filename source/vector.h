@@ -2,6 +2,7 @@
 #define _VECTOR_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #define VECTOR_DEFAULT_CAP 64
 
@@ -10,16 +11,25 @@
  */
 typedef struct Allocator
 {
-    void *(*malloc)(size_t);   /**< Function to allocate memory. */
+    void *(*malloc)(size_t);          /**< Function to allocate memory. */
     void *(*realloc)(void *, size_t); /**< Function to reallocate memory. */
-    void (*free)(void *);       /**< Function to free memory. */
+    void (*free)(void *);             /**< Function to free memory. */
 } Allocator;
 
 #ifdef VECTOR_DEBUG
 #include <stdio.h>
 #define VECTOR_DEBUG_PERROR(string) perror(string)
+#define VECTOR_VALIDATE(v)                                                          \
+    do                                                                              \
+    {                                                                               \
+        if (((uintptr_t)(v)) % sizeof(void *) != 0)                                 \
+        {                                                                           \
+            VECTOR_DEBUG_PERROR("Vector Validate: vector not properly aligned.\n"); \
+        }                                                                           \
+    } while (0)
 #else
 #define VECTOR_DEBUG_PERROR(string)
+#define VECTOR_VALIDATE(v)
 #endif
 
 /**
@@ -143,7 +153,7 @@ int vector_set_len(void *vector, size_t len);
  * @param index Index to be removed.
  * @return 0 on success, 1 on error.
  */
-int vector_remove(void* vector, size_t index);
+int vector_remove(void *vector, size_t index);
 
 /**
  * @brief Remove index from vector. Respects order.
@@ -152,6 +162,6 @@ int vector_remove(void* vector, size_t index);
  * @param index Index to be removed.
  * @return 0 on success, 1 on error.
  */
-int vector_remove_ordered(void* vector, size_t index);
+int vector_remove_ordered(void *vector, size_t index);
 
 #endif /* _VECTOR_H */

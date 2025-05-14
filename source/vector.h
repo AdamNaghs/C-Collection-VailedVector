@@ -25,22 +25,6 @@ typedef struct Allocator
     void (*free)(void *);             /**< Function to free memory. */
 } Allocator;
 
-#ifdef VECTOR_DEBUG
-#include <stdio.h>
-#define VECTOR_DEBUG_PERROR(string) perror(string)
-#define VECTOR_VALIDATE(v)                                                          \
-    do                                                                              \
-    {                                                                               \
-        if (((uintptr_t)(v)) % sizeof(void *) != 0)                                 \
-        {                                                                           \
-            VECTOR_DEBUG_PERROR("Vector Validate: vector not properly aligned.\n"); \
-        }                                                                           \
-    } while (0)
-#else
-#define VECTOR_DEBUG_PERROR(string)
-#define VECTOR_VALIDATE(v)
-#endif
-
 /**
  * @brief Create a new vector of type T using a specified allocator.
  *
@@ -49,97 +33,6 @@ typedef struct Allocator
  * @return T* Pointer to the start of the vector's elements.
  */
 #define vector(T, a) (T *)vector_init(sizeof(T), VECTOR_DEFAULT_CAP, a)
-
-/**
- * @brief Push an item onto the end of the vector.
- *
- * Automatically resizes if necessary. Debug prints on errors if VECTOR_DEBUG is enabled.
- *
- * @param v Vector pointer.
- * @param item Item to push.
- */
-#define vector_push_back(v, item)                                          \
-    do                                                                     \
-    {                                                                      \
-        if (!(v))                                                          \
-        {                                                                  \
-            VECTOR_DEBUG_PERROR("Vector Push Back: given null.\n");        \
-            break;                                                         \
-        }                                                                  \
-        size_t _len, _cap;                                                 \
-        vector_get_cap(v, &_cap);                                          \
-        vector_get_len(v, &_len);                                          \
-        if (vector_can_append(v) != VEC_OK)                                \
-        {                                                                  \
-            void *_tmp = vector_resize(v, (_cap + 1) * 2);                 \
-            if (!_tmp)                                                     \
-            {                                                              \
-                VECTOR_DEBUG_PERROR("Vector Push Back: resize failed.\n"); \
-                break;                                                     \
-            }                                                              \
-            (v) = _tmp;                                                    \
-        }                                                                  \
-        (v)[_len++] = (item);                                              \
-        vector_set_len(v, _len);                                           \
-    } while (0)
-
-#define vector_push_many(v, source, len)                            \
-    do                                                              \
-    {                                                               \
-        if (!(v))                                                   \
-        {                                                           \
-            VECTOR_DEBUG_PERROR("Vector Push Many: given null.\n"); \
-            break;                                                  \
-        }                                                           \
-        size_t _vi;                                                 \
-        for (_vi = 0; _vi < (size_t)(len); _vi++)                   \
-        {                                                           \
-            vector_push_back((v), (source)[_vi]);                   \
-        }                                                           \
-    } while (0)
-
-#define vector_insert(v, index, item)                                               \
-    do                                                                              \
-    {                                                                               \
-        if (!(v))                                                                   \
-        {                                                                           \
-            VECTOR_DEBUG_PERROR("Vector Insert: given null.\n");                    \
-            break;                                                                  \
-        }                                                                           \
-        size_t _len, _cap;                                                          \
-        vector_get_cap(v, &_cap);                                                   \
-        vector_get_len(v, &_len);                                                   \
-        if ((index) > _len)                                                         \
-        {                                                                           \
-            VECTOR_DEBUG_PERROR("Vector Insert: index out of bounds.\n");           \
-            break;                                                                  \
-        }                                                                           \
-        if (vector_can_append(v) != VEC_OK)                                         \
-        {                                                                           \
-            void *_tmp = vector_resize(v, (_cap + 1) * 2);                          \
-            if (!_tmp)                                                              \
-            {                                                                       \
-                VECTOR_DEBUG_PERROR("Vector Insert: resize failed.\n");             \
-                break;                                                              \
-            }                                                                       \
-            (v) = _tmp;                                                             \
-        }                                                                           \
-        memmove(&(v)[(index) + 1], &(v)[(index)], (_len - (index)) * sizeof(*(v))); \
-        (v)[(index)] = (item);                                                      \
-        vector_set_len(v, _len + 1);                                                \
-    } while (0)
-
-#define vector_shrink(v) ((v) = vector_shrink_to_fit(v))
-
-#define vector_foreach(T, v, var)                                                                                   \
-    for (size_t _i = 0, _len = 0;                                                                                   \
-         (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
-         ++_i)
-
-#define vector_foreach_ansi(_i, _len, T, v, var)                                                                    \
-    for (_i = 0, _len = 0;                                                                                          \
-         (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
-         ++_i)
 
 /**
  * @brief Initialize a vector.
@@ -253,5 +146,112 @@ void *vector_shrink_to_fit(void *vector_ptr);
  * @return const char*
  */
 const char *vector_status_to_string(VectorStatus status);
+
+#ifdef VECTOR_DEBUG
+#include <stdio.h>
+#define VECTOR_DEBUG_PERROR(string) perror(string)
+#define VECTOR_VALIDATE(v)                                                          \
+    do                                                                              \
+    {                                                                               \
+        if (((uintptr_t)(v)) % sizeof(void *) != 0)                                 \
+        {                                                                           \
+            VECTOR_DEBUG_PERROR("Vector Validate: vector not properly aligned.\n"); \
+        }                                                                           \
+    } while (0)
+#else
+#define VECTOR_DEBUG_PERROR(string)
+#define VECTOR_VALIDATE(v)
+#endif
+
+/**
+ * @brief Push an item onto the end of the vector.
+ *
+ * Automatically resizes if necessary. Debug prints on errors if VECTOR_DEBUG is enabled.
+ *
+ * @param v Vector pointer.
+ * @param item Item to push.
+ */
+#define vector_push_back(v, item)                                          \
+    do                                                                     \
+    {                                                                      \
+        if (!(v))                                                          \
+        {                                                                  \
+            VECTOR_DEBUG_PERROR("Vector Push Back: given null.\n");        \
+            break;                                                         \
+        }                                                                  \
+        size_t _len, _cap;                                                 \
+        vector_get_cap(v, &_cap);                                          \
+        vector_get_len(v, &_len);                                          \
+        if (vector_can_append(v) != VEC_OK)                                \
+        {                                                                  \
+            void *_tmp = vector_resize(v, (_cap + 1) * 2);                 \
+            if (!_tmp)                                                     \
+            {                                                              \
+                VECTOR_DEBUG_PERROR("Vector Push Back: resize failed.\n"); \
+                break;                                                     \
+            }                                                              \
+            (v) = _tmp;                                                    \
+        }                                                                  \
+        (v)[_len++] = (item);                                              \
+        vector_set_len(v, _len);                                           \
+    } while (0)
+
+#define vector_push_many(v, source, len)                            \
+    do                                                              \
+    {                                                               \
+        if (!(v))                                                   \
+        {                                                           \
+            VECTOR_DEBUG_PERROR("Vector Push Many: given null.\n"); \
+            break;                                                  \
+        }                                                           \
+        size_t _vi;                                                 \
+        for (_vi = 0; _vi < (size_t)(len); _vi++)                   \
+        {                                                           \
+            vector_push_back((v), (source)[_vi]);                   \
+        }                                                           \
+    } while (0)
+
+#define vector_insert(v, index, item)                                               \
+    do                                                                              \
+    {                                                                               \
+        if (!(v))                                                                   \
+        {                                                                           \
+            VECTOR_DEBUG_PERROR("Vector Insert: given null.\n");                    \
+            break;                                                                  \
+        }                                                                           \
+        size_t _len, _cap;                                                          \
+        vector_get_cap(v, &_cap);                                                   \
+        vector_get_len(v, &_len);                                                   \
+        if ((index) > _len)                                                         \
+        {                                                                           \
+            VECTOR_DEBUG_PERROR("Vector Insert: index out of bounds.\n");           \
+            break;                                                                  \
+        }                                                                           \
+        if (vector_can_append(v) != VEC_OK)                                         \
+        {                                                                           \
+            void *_tmp = vector_resize(v, (_cap + 1) * 2);                          \
+            if (!_tmp)                                                              \
+            {                                                                       \
+                VECTOR_DEBUG_PERROR("Vector Insert: resize failed.\n");             \
+                break;                                                              \
+            }                                                                       \
+            (v) = _tmp;                                                             \
+        }                                                                           \
+        memmove(&(v)[(index) + 1], &(v)[(index)], (_len - (index)) * sizeof(*(v))); \
+        (v)[(index)] = (item);                                                      \
+        vector_set_len(v, _len + 1);                                                \
+    } while (0)
+
+#define vector_shrink(v) ((v) = vector_shrink_to_fit(v))
+
+#define vector_foreach(T, v, var)                                                                                   \
+    for (size_t _i = 0, _len = 0;                                                                                   \
+         (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
+         ++_i)
+
+#define vector_foreach_ansi(_i, _len, T, v, var)                                                                    \
+    for (_i = 0, _len = 0;                                                                                          \
+         (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
+         ++_i)
 
 #endif /* _VECTOR_H */

@@ -120,14 +120,14 @@ int test_can_append(void)
         vector_push_back(vec, i);
     }
 
-    if (vector_can_append(vec) != 0) /*  Should be full */
+    if (vector_can_append(vec) == VEC_OK) /*  Should be full */
         return 1;
 
     vec = vector_resize(vec, VECTOR_DEFAULT_CAP * 2);
     if (!vec)
         return 1;
 
-    if (vector_can_append(vec) != 1) /*  Should have space now */
+    if (vector_can_append(vec) == VEC_ERR) /*  Should have space now */
         return 1;
 
     vector_free(vec);

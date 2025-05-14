@@ -244,7 +244,7 @@ void *vector_resize(void *vector, size_t cap)
 }
 
 /* Pop back: reduce length and return pointer to popped item */
-VectorStatus vector_pop_back(void *vector, void* out)
+VectorStatus vector_pop_back(void *vector, void *out)
 {
     if (!vector || !out)
     {
@@ -258,25 +258,25 @@ VectorStatus vector_pop_back(void *vector, void* out)
         return VEC_EMPTY;
     }
     hdr->len--;
-    memcpy(out,(byte_t *)vector + (hdr->len * hdr->tsize),hdr->tsize);
+    memcpy(out, (byte_t *)vector + (hdr->len * hdr->tsize), hdr->tsize);
     return VEC_OK;
 }
 
-const char* vector_status_to_string(VectorStatus status)
+const char *vector_status_to_string(VectorStatus status)
 {
     switch (status)
     {
-        case VEC_OK:
-            return "VEC_OK";
-        case VEC_ERR:
-            return "VEC_ERR";
-        case VEC_FULL:
-            return "VEC_FULL";
-        case VEC_EMPTY:
-            return "VEC_EMPTY";
-        case VEC_INDEX_OOB:
-            return "VEC_INDEX_OOB";
-        default: 
-            return "Unknown Vector Status";
+    case VEC_OK:
+        return "VEC_OK";
+    case VEC_ERR:
+        return "VEC_ERR";
+    case VEC_FULL:
+        return "VEC_FULL";
+    case VEC_EMPTY:
+        return "VEC_EMPTY";
+    case VEC_INDEX_OOB:
+        return "VEC_INDEX_OOB";
+    default:
+        return "Unknown Vector Status";
     }
 }

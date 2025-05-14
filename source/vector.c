@@ -268,13 +268,12 @@ const char* vector_status_to_string(VectorStatus status)
     {
         case VEC_OK:
             return "VEC_OK";
-
         case VEC_ERR:
             return "VEC_ERR";
-
         case VEC_FULL:
             return "VEC_FULL";
-        
+        case VEC_EMPTY:
+            return "VEC_EMPTY";
         case VEC_INDEX_OOB:
             return "VEC_INDEX_OOB";
         default: 

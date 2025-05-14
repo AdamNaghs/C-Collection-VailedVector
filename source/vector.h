@@ -129,6 +129,15 @@ int vector_get_cap(void *vector, size_t *out);
 int vector_get_len(void *vector, size_t *out);
 
 /**
+ * @brief Set the length of the vector.
+ *
+ * @param vector Vector pointer.
+ * @param len New length.
+ * @return 0 on success, 1 on error.
+ */
+int vector_set_len(void *vector, size_t len);
+
+/**
  * @brief Resize the vector to a new capacity.
  *
  * @param vector Vector pointer.
@@ -138,13 +147,12 @@ int vector_get_len(void *vector, size_t *out);
 void *vector_resize(void *vector, size_t cap);
 
 /**
- * @brief Set the length of the vector.
+ * @brief Resizes capacity to match length;
  *
- * @param vector Vector pointer.
- * @param len New length.
+ * @param vector Reference to Vector pointer.
  * @return 0 on success, 1 on error.
  */
-int vector_set_len(void *vector, size_t len);
+void* vector_shrink_to_fit(void *vector_ptr);
 
 /**
  * @brief Remove index from vector. Doesn't respect order.
@@ -163,5 +171,6 @@ int vector_remove(void *vector, size_t index);
  * @return 0 on success, 1 on error.
  */
 int vector_remove_ordered(void *vector, size_t index);
+
 
 #endif /* _VECTOR_H */

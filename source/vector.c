@@ -154,14 +154,14 @@ void *vector_pop_back(void *vector)
     return (byte_t *)vector + (hdr->len * hdr->tsize);
 }
 
-int vector_remove(void* vector, size_t index)
+int vector_remove(void *vector, size_t index)
 {
     if (!vector)
     {
         VECTOR_DEBUG_PERROR("Vector Remove: given null vector.\n");
         return 1;
     }
-    VectorHeader* hdr = VECTOR_HEADER(vector);
+    VectorHeader *hdr = VECTOR_HEADER(vector);
 
     if (index >= hdr->len)
     {
@@ -172,36 +172,57 @@ int vector_remove(void* vector, size_t index)
     if (hdr->len > 1 && index != hdr->len - 1)
     {
         /* Move entire tail of the array forward one space */
-        memmove((byte_t*)vector + hdr->tsize * index,
-            (byte_t*)vector + hdr->tsize * (index + 1),
-            (hdr->len - index - 1) * hdr->tsize);
+        memmove((byte_t *)vector + hdr->tsize * index,
+                (byte_t *)vector + hdr->tsize * (index + 1),
+                (hdr->len - index - 1) * hdr->tsize);
     }
 
     hdr->len--;
     return 0;
 }
 
-
 int vector_remove_ordered(void *vector, size_t index)
 {
     if (!vector)
     {
-        VECTOR_DEBUG_PERROR("Vector Pop Back: given null vector.\n");
+        VECTOR_DEBUG_PERROR("Vector Remove Ordered: given null vector.\n");
         return 1;
     }
+
     VectorHeader *hdr = VECTOR_HEADER(vector);
     if (index >= hdr->len)
     {
-        VECTOR_DEBUG_PERROR("Vector Remove: index out of bounds.\n");
+        VECTOR_DEBUG_PERROR("Vector Remove Ordered: index out of bounds.\n");
         return 1;
     }
+
     if (hdr->len > 1 && index != hdr->len - 1)
     {
-        memmove((byte_t*)vector + hdr->tsize * index,
-               (byte_t*)vector + hdr->tsize * (index + 1),
-               hdr->tsize);
+        memmove((byte_t *)vector + hdr->tsize * index,
+                (byte_t *)vector + hdr->tsize * (index + 1),
+                hdr->tsize);
     }
 
     hdr->len--;
     return 0;
+}
+
+void* vector_shrink_to_fit(void *vector)
+{
+    if (!vector)
+    {
+        VECTOR_DEBUG_PERROR("Vector Shrink to Fit: given null vector.\n");
+        return NULL;
+    }
+
+    VectorHeader *hdr = VECTOR_HEADER(vector);
+
+    void* new_vec = vector_resize(vector, hdr->len);
+    if (!new_vec)
+    {
+        VECTOR_DEBUG_PERROR("Vector Shrink to Fit: resize failed.\n");
+        return NULL;
+    }
+
+    return new_vec;
 }

@@ -154,6 +154,7 @@ void *vector_pop_back(void *vector)
     return (byte_t *)vector + (hdr->len * hdr->tsize);
 }
 
+/* Unordered remove */
 int vector_remove(void *vector, size_t index)
 {
     if (!vector)
@@ -181,6 +182,7 @@ int vector_remove(void *vector, size_t index)
     return 0;
 }
 
+/* Respects order */
 int vector_remove_ordered(void *vector, size_t index)
 {
     if (!vector)
@@ -255,4 +257,33 @@ void* vector_normal_copy(void* vector, void* (*malloc_fn)(size_t))
 
     memcpy(raw, vector, total_size);
     return raw;
+}
+
+
+int vector_push_all(void* vector, const void* data, size_t count)
+{
+    if (!vector || !data)
+    {
+        VECTOR_DEBUG_PERROR("Vector Push All: given null pointer.\n");
+        return 1;
+    }
+
+    VectorHeader* hdr = VECTOR_HEADER(vector);
+
+    if (hdr->len + count > hdr->cap)
+    {
+        size_t new_cap = (hdr->cap * 2 > hdr->len + count) ? hdr->cap * 2 : hdr->len + count; /* Attempt to double, if thats not large enough just add the count to the length */
+        void* resized = vector_resize(vector, new_cap);
+        if (!resized)
+        {
+            VECTOR_DEBUG_PERROR("Vector Push All: resize failed.\n");
+            return 1;
+        }
+        vector = resized;
+    }
+
+    memcpy((byte_t*)vector + hdr->len * hdr->tsize, data, count * hdr->tsize);
+    hdr->len += count;
+
+    return 0;
 }

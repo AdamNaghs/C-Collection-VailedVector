@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define VECTOR_DEFAULT_CAP 64
+#define VECTOR_DEFAULT_CAP 16
 
 /**
  * @brief Allocator interface for the vector system.
@@ -182,5 +182,8 @@ int vector_remove_ordered(void *vector, size_t index);
  * @return Pointer to plain array or NULL on failure.
  */
 void *vector_normal_copy(void *vector, void *(*malloc_fn)(size_t));
+
+int vector_push_all(void* vector, const void* data, size_t count);
+
 
 #endif /* _VECTOR_H */

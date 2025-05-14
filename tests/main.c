@@ -182,10 +182,23 @@ int test_remove(void)
     vector_push_back(vec, 2);
     vector_push_back(vec, 3);
 
+    size_t i,len;
+    int item = -1;;
+    vector_foreach_ansi(i,len,int,vec,item)
+    {
+        printf("Hello %d\n",item);
+    }
+
+    /*
+    vector_foreach(int,vec,item)
+    {
+        printf("Hello %d\n",item);
+    }
+    */
+
     if (vector_remove(vec, 1) != 0)
         return 1;
 
-    size_t len;
     if (vector_get_len(vec, &len) != 0)
         return 1;
     if (len != 2)

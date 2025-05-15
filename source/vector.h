@@ -196,6 +196,13 @@ const char *vector_status_to_string(VectorStatus status);
         vector_set_len(v, _len);                                           \
     } while (0)
 
+/**
+ * @brief 
+ * 
+ * @param v Vector pointer.
+ * @param source Source array, can be value type array i.e. {1, 2, 3}.
+ * @param len Length of source array.
+ */
 #define vector_push_many(v, source, len)                            \
     do                                                              \
     {                                                               \
@@ -211,6 +218,15 @@ const char *vector_status_to_string(VectorStatus status);
         }                                                           \
     } while (0)
 
+/**
+ * @brief Push an item onto the end of the vector.
+ *
+ * Automatically resizes if necessary. Debug prints on errors if VECTOR_DEBUG is enabled.
+ *
+ * @param v Vector pointer.
+ * @param index Index to insert item to.
+ * @param item Item to push.
+ */
 #define vector_insert(v, index, item)                                               \
     do                                                                              \
     {                                                                               \

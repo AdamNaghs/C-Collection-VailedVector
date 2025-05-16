@@ -79,15 +79,6 @@ VectorStatus vector_get_cap(void *vector, size_t *out);
 VectorStatus vector_get_len(void *vector, size_t *out);
 
 /**
- * @brief Set the length of the vector. Doesn't do bounds checking. Feel free to ignore, its just used by a macro.
- *
- * @param vector Vector pointer.
- * @param len New length.
- * @return VEC_OK on success, VEC_ERR on error
- */
-VectorStatus vector_set_len(void *vector, size_t len);
-
-/**
  * @brief Remove index from vector. Doesn't respect order.
  *
  * @param vector Vector pointer.
@@ -181,7 +172,7 @@ const char *vector_status_to_string(VectorStatus status);
         size_t _len;                                                       \
         vector_get_len(v, &_len);                                          \
         (v)[_len++] = (item);                                              \
-        vector_set_len(v, _len);                                           \
+        internal_vector_set_len(v, _len);                                           \
     } while (0)
 
 /**
@@ -225,7 +216,7 @@ const char *vector_status_to_string(VectorStatus status);
         (v)[(index)] = (item);                                                   \
         size_t _len;                                                             \
         vector_get_len(v, &_len);                                                \
-        vector_set_len(v, _len + 1);                                             \
+        internal_vector_set_len(v, _len + 1);                                             \
     } while (0)
 
 /**
@@ -288,5 +279,7 @@ const char *vector_status_to_string(VectorStatus status);
 void *internal_vector_prepare_push_back(void *vptr, size_t item_size);
 
 void *internal_vector_prepare_insert(void *vptr, size_t item_size, size_t index);
+
+VectorStatus internal_vector_set_len(void *vector, size_t len);
 
 #endif /* _VECTOR_H */

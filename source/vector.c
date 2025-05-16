@@ -99,19 +99,6 @@ VectorStatus vector_get_len(void *vector, size_t *out)
     return VEC_OK;
 }
 
-/* Set vector length (no bounds check) */
-VectorStatus vector_set_len(void *vector, size_t len)
-{
-    if (!vector)
-    {
-        VECTOR_DEBUG_PERROR("Vector Set Len: given null vector.\n");
-        return VEC_ERR;
-    }
-    VectorHeader *hdr = VECTOR_HEADER(vector);
-    hdr->len = len;
-    return VEC_OK;
-}
-
 /* Unordered remove */
 VectorStatus vector_remove(void *vector, size_t index)
 {
@@ -342,4 +329,17 @@ void *internal_vector_prepare_insert(void *vptr, size_t item_size, size_t index)
             (len - index) * item_size);
 
     return vptr;
+}
+
+/* Set vector length (no bounds check) */
+VectorStatus internal_vector_set_len(void *vector, size_t len)
+{
+    if (!vector)
+    {
+        VECTOR_DEBUG_PERROR("Vector Set Len: given null vector.\n");
+        return VEC_ERR;
+    }
+    VectorHeader *hdr = VECTOR_HEADER(vector);
+    hdr->len = len;
+    return VEC_OK;
 }

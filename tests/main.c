@@ -151,26 +151,6 @@ int test_get_cap(void)
     return 0;
 }
 
-int test_set_len(void)
-{
-    Allocator a = {malloc, realloc, free};
-    int *vec = vector(int, &a);
-    if (!vec)
-        return 1;
-
-    if (vector_set_len(vec, 10) != 0)
-        return 1;
-
-    size_t len;
-    if (vector_get_len(vec, &len) != 0)
-        return 1;
-    if (len != 10)
-        return 1;
-
-    vector_free(vec);
-    return 0;
-}
-
 int test_remove(void)
 {
     Allocator a = {malloc, realloc, free};

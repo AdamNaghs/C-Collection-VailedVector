@@ -57,7 +57,7 @@ int test_pop_back(void)
     vector_push_back(vec, 200);
     vector_push_back(vec, 300);
     int popped;
-    vector_pop_back(vec,&popped);
+    vector_pop_back(vec, &popped);
     if (popped != 300)
         return 1;
 
@@ -67,7 +67,7 @@ int test_pop_back(void)
     if (len != 2)
         return 1;
 
-    vector_pop_back(vec,&popped);
+    vector_pop_back(vec, &popped);
     if (popped != 200)
         return 1;
 
@@ -182,15 +182,15 @@ int test_remove(void)
     vector_push_back(vec, 2);
     vector_push_back(vec, 3);
 
-    size_t i,len;
+    size_t i, len;
     int item = -1;
-    vector_foreach_ansi(i,len,vec,item)
+    vector_foreach_ansi(i, len, vec, item)
     {
-        printf("Hello %d\n",item);
+        printf("Hello %d\n", item);
     }
 
     /*
-    vector_foreach(int,vec,item)
+    vector_foreach(vec,item)
     {
         printf("Hello %d\n",item);
     }
@@ -253,7 +253,7 @@ int test_vector_of_dyn(void)
         return 1;
 
     /*  Create a few inner vectors manually */
-    size_t i,j; 
+    size_t i, j;
     for (i = 0; i < 3; ++i)
     {
         int *inner = malloc(sizeof(int) * 4);
@@ -304,7 +304,7 @@ int test_vector_of_vectors(void)
         return 1;
 
     /*  Create a few inner VECTORS manually */
-    size_t i,j;
+    size_t i, j;
     for (i = 0; i < 3; ++i)
     {
         int *inner = vector(int, &a);
@@ -355,11 +355,37 @@ int test_vector_of_vectors(void)
     return 0;
 }
 
+int test_insert(void)
+{
+    Allocator a = {malloc, realloc, free};
+    int *vec = vector(int, &a);
+    if (!vec)
+        return 1;
+
+    vector_push_back(vec, 1);
+    vector_push_back(vec, 3);
+
+    /*  Insert 2 at index 1: should become [1, 2, 3] */
+    vector_insert(vec, 1, 2);
+
+    size_t len;
+    if (vector_get_len(vec, &len) != 0)
+        return 1;
+    if (len != 3)
+        return 1;
+
+    if (vec[0] != 1 || vec[1] != 2 || vec[2] != 3)
+        return 1;
+
+    vector_free(vec);
+    return 0;
+}
+
 /*  -------- Main Test Runner -------- */
 
 int main(void)
 {
-    int total = 11;
+    int total = 12;
     int score = 0;
 
     score += (test_init_free() == 0);
@@ -373,6 +399,7 @@ int main(void)
     score += (test_remove_ordered() == 0);
     score += (test_vector_of_dyn() == 0);
     score += (test_vector_of_vectors() == 0);
+    score += (test_insert() == 0);
 
     printf("%d/%d tests passed.\n", score, total);
     return 0;

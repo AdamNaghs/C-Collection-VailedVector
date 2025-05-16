@@ -215,44 +215,70 @@ const char *vector_status_to_string(VectorStatus status);
  * @param index Index to insert item to.
  * @param item Item to push.
  */
-#define vector_insert(v, index, item)                                               \
-    do                                                                              \
-    {                                                                               \
-        if (!(v))                                                                   \
-        {                                                                           \
-            VECTOR_DEBUG_PERROR("Vector Insert: given null.\n");                    \
-            break;                                                                  \
-        }                                                                           \
-        size_t _len, _cap;                                                          \
-        vector_get_cap(v, &_cap);                                                   \
-        vector_get_len(v, &_len);                                                   \
-        if ((index) > _len)                                                         \
-        {                                                                           \
-            VECTOR_DEBUG_PERROR("Vector Insert: index out of bounds.\n");           \
-            break;                                                                  \
-        }                                                                           \
-        if (vector_can_append(v) != VEC_OK)                                         \
-        {                                                                           \
-            void *_tmp = vector_resize(v, (_cap + 1) * 2);                          \
-            if (!_tmp)                                                              \
-            {                                                                       \
-                VECTOR_DEBUG_PERROR("Vector Insert: resize failed.\n");             \
-                break;                                                              \
-            }                                                                       \
-            (v) = _tmp;                                                             \
-        }                                                                           \
-        memmove(&(v)[(index) + 1], &(v)[(index)], (_len - (index)) * sizeof(*(v))); \
-        (v)[(index)] = (item);                                                      \
-        vector_set_len(v, _len + 1);                                                \
+#define vector_insert(v, index, item)                                            \
+    do                                                                           \
+    {                                                                            \
+        void *_tmp = internal_vector_prepare_insert((v), sizeof(*(v)), (index)); \
+        if (!_tmp)                                                               \
+            break;                                                               \
+        (v) = _tmp;                                                              \
+        (v)[(index)] = (item);                                                   \
+        size_t _len;                                                             \
+        vector_get_len(v, &_len);                                                \
+        vector_set_len(v, _len + 1);                                             \
     } while (0)
 
+/**
+ * @brief Shrinks the capacity of the vector to fit its current length.
+ *
+ * This releases any unused memory beyond the current number of elements.
+ * 
+ * @param v Vector pointer (will be reassigned).
+ * @return The shrunk vector pointer (same as v), or NULL on failure.
+ */
 #define vector_shrink(v) ((v) = vector_shrink_to_fit(v))
 
-#define vector_foreach(T, v, var)                                                                                   \
+/**
+ * @brief Iterate over a vector with automatic type deduction.
+ *
+ * @param T The type of each element.
+ * @param v The vector pointer.
+ * @param var A variable of type T to receive each element during iteration.
+ *
+ * Example:
+ * @code
+ * int *vec = vector(int, &a);
+ * vector_push_back(vec, 10);
+ * int val = 0;
+ * vector_foreach(vec, val) {
+ *     printf("%d\n", val);
+ * }
+ * @endcode
+ */
+#define vector_foreach(v, var)                                                                                      \
     for (size_t _i = 0, _len = 0;                                                                                   \
          (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
          ++_i)
 
+/**
+ * @brief ANSI-compatible foreach that exposes index and length.
+ *
+ * Use this when you need both the index and element. Also avoids shadowing.
+ *
+ * @param _i The loop index variable.
+ * @param _len A variable to hold the total vector length.
+ * @param v The vector pointer.
+ * @param var A variable to receive each element.
+ *
+ * Example:
+ * @code
+ * size_t i, len;
+ * int item;
+ * vector_foreach_ansi(i, len, vec, item) {
+ *     printf("[%zu] %d\n", i, item);
+ * }
+ * @endcode
+ */
 #define vector_foreach_ansi(_i, _len, v, var)                                                                       \
     for (_i = 0, _len = 0;                                                                                          \
          (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
@@ -260,5 +286,7 @@ const char *vector_status_to_string(VectorStatus status);
 
 /* Internal methdods */
 void *internal_vector_prepare_push_back(void *vptr, size_t item_size);
+
+void *internal_vector_prepare_insert(void *vptr, size_t item_size, size_t index);
 
 #endif /* _VECTOR_H */

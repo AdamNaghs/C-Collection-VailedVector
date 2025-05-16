@@ -281,10 +281,10 @@ const char *vector_status_to_string(VectorStatus status)
     }
 }
 
-
-void* internal_vector_prepare_push_back(void* vptr, size_t item_size) 
+void *internal_vector_prepare_push_back(void *vptr, size_t item_size)
 {
-    if (!vptr) {
+    if (!vptr)
+    {
         VECTOR_DEBUG_PERROR("Vector Push Back: given null.\n");
         return NULL;
     }
@@ -293,14 +293,53 @@ void* internal_vector_prepare_push_back(void* vptr, size_t item_size)
     vector_get_cap(vptr, &cap);
     vector_get_len(vptr, &len);
 
-    if (vector_can_append(vptr) != VEC_OK) {
-        void* tmp = vector_resize(vptr, (cap + 1) * 2);
-        if (!tmp) {
+    if (vector_can_append(vptr) != VEC_OK)
+    {
+        void *tmp = vector_resize(vptr, (cap + 1) * 2);
+        if (!tmp)
+        {
             VECTOR_DEBUG_PERROR("Vector Push Back: resize failed.\n");
             return NULL;
         }
         vptr = tmp;
     }
+
+    return vptr;
+}
+
+void *internal_vector_prepare_insert(void *vptr, size_t item_size, size_t index)
+{
+    if (!vptr)
+    {
+        VECTOR_DEBUG_PERROR("Vector Insert: given null.\n");
+        return NULL;
+    }
+
+    size_t len, cap;
+    vector_get_cap(vptr, &cap);
+    vector_get_len(vptr, &len);
+
+    if (index > len)
+    {
+        VECTOR_DEBUG_PERROR("Vector Insert: index out of bounds.\n");
+        return NULL;
+    }
+
+    if (vector_can_append(vptr) != VEC_OK)
+    {
+        void *tmp = vector_resize(vptr, (cap + 1) * 2);
+        if (!tmp)
+        {
+            VECTOR_DEBUG_PERROR("Vector Insert: resize failed.\n");
+            return NULL;
+        }
+        vptr = tmp;
+    }
+
+    /*shift elements right (leave space for new item) */
+    memmove((char *)vptr + (index + 1) * item_size,
+            (char *)vptr + index * item_size,
+            (len - index) * item_size);
 
     return vptr;
 }

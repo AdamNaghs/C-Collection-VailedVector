@@ -183,8 +183,8 @@ int test_remove(void)
     vector_push_back(vec, 3);
 
     size_t i,len;
-    int item = -1;;
-    vector_foreach_ansi(i,len,int,vec,item)
+    int item = -1;
+    vector_foreach_ansi(i,len,vec,item)
     {
         printf("Hello %d\n",item);
     }

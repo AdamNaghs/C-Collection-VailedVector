@@ -174,31 +174,19 @@ const char *vector_status_to_string(VectorStatus status);
 #define vector_push_back(v, item)                                          \
     do                                                                     \
     {                                                                      \
-        if (!(v))                                                          \
-        {                                                                  \
-            VECTOR_DEBUG_PERROR("Vector Push Back: given null.\n");        \
+        void *_tmp = internal_vector_prepare_push_back((v), sizeof(*(v))); \
+        if (!_tmp)                                                         \
             break;                                                         \
-        }                                                                  \
-        size_t _len, _cap;                                                 \
-        vector_get_cap(v, &_cap);                                          \
+        (v) = _tmp; /* Resize if needed */                                 \
+        size_t _len;                                                       \
         vector_get_len(v, &_len);                                          \
-        if (vector_can_append(v) != VEC_OK)                                \
-        {                                                                  \
-            void *_tmp = vector_resize(v, (_cap + 1) * 2);                 \
-            if (!_tmp)                                                     \
-            {                                                              \
-                VECTOR_DEBUG_PERROR("Vector Push Back: resize failed.\n"); \
-                break;                                                     \
-            }                                                              \
-            (v) = _tmp;                                                    \
-        }                                                                  \
         (v)[_len++] = (item);                                              \
         vector_set_len(v, _len);                                           \
     } while (0)
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  * @param v Vector pointer.
  * @param source Source array, can be value type array i.e. {1, 2, 3}.
  * @param len Length of source array.
@@ -265,9 +253,12 @@ const char *vector_status_to_string(VectorStatus status);
          (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
          ++_i)
 
-#define vector_foreach_ansi(_i, _len, T, v, var)                                                                    \
+#define vector_foreach_ansi(_i, _len, v, var)                                                                       \
     for (_i = 0, _len = 0;                                                                                          \
          (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
          ++_i)
+
+/* Internal methdods */
+void *internal_vector_prepare_push_back(void *vptr, size_t item_size);
 
 #endif /* _VECTOR_H */

@@ -280,3 +280,27 @@ const char *vector_status_to_string(VectorStatus status)
         return "Unknown Vector Status";
     }
 }
+
+
+void* internal_vector_prepare_push_back(void* vptr, size_t item_size) 
+{
+    if (!vptr) {
+        VECTOR_DEBUG_PERROR("Vector Push Back: given null.\n");
+        return NULL;
+    }
+
+    size_t len, cap;
+    vector_get_cap(vptr, &cap);
+    vector_get_len(vptr, &len);
+
+    if (vector_can_append(vptr) != VEC_OK) {
+        void* tmp = vector_resize(vptr, (cap + 1) * 2);
+        if (!tmp) {
+            VECTOR_DEBUG_PERROR("Vector Push Back: resize failed.\n");
+            return NULL;
+        }
+        vptr = tmp;
+    }
+
+    return vptr;
+}

@@ -191,12 +191,12 @@ const char *vector_status_to_string(VectorStatus status);
  * int *vec = vector(int, &a);
  * vector_push_back(vec, 10);
  * int val = 0;
- * vector_foreach(vec, val) {
- *     printf("%d\n", val);
+ * vector_foreach(i,vec, val) { // here you only need to provide the val variable
+ *     printf("%zu:%d\n",i, val);
  * }
  * @endcode
  */
-#define vector_foreach(v, var)                                                                                      \
+#define vector_foreach(_i,v, var)                                                                                      \
     for (size_t _i = 0, _len = 0;                                                                                   \
          (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
          ++_i)
@@ -215,7 +215,7 @@ const char *vector_status_to_string(VectorStatus status);
  * @code
  * size_t i, len;
  * int item;
- * vector_foreach_ansi(i, len, vec, item) {
+ * vector_foreach_ansi(i, len, vec, item) { // here you need to provide all variables
  *     printf("[%zu] %d\n", i, item);
  * }
  * @endcode

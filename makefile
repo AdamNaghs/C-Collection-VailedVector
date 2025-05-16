@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -ansi
-SRC = ./tests/main.c ./source/vector.c
+SRC = ./tests/test.c ./source/vector.c
 OUT = test.exe
 
 all: $(OUT)

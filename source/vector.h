@@ -138,22 +138,6 @@ void *vector_shrink_to_fit(void *vector_ptr);
  */
 const char *vector_status_to_string(VectorStatus status);
 
-#ifdef VECTOR_DEBUG
-#include <stdio.h>
-#define VECTOR_DEBUG_PERROR(string) perror(string)
-#define VECTOR_VALIDATE(v)                                                          \
-    do                                                                              \
-    {                                                                               \
-        if (((uintptr_t)(v)) % sizeof(void *) != 0)                                 \
-        {                                                                           \
-            VECTOR_DEBUG_PERROR("Vector Validate: vector not properly aligned.\n"); \
-        }                                                                           \
-    } while (0)
-#else
-#define VECTOR_DEBUG_PERROR(string)
-#define VECTOR_VALIDATE(v)
-#endif
-
 /**
  * @brief Push an item onto the end of the vector.
  *
@@ -162,18 +146,8 @@ const char *vector_status_to_string(VectorStatus status);
  * @param v Vector pointer.
  * @param item Item to push.
  */
-#define vector_push_back(v, item)                                          \
-    do                                                                     \
-    {                                                                      \
-        void *_tmp = internal_vector_prepare_push_back((v), sizeof(*(v))); \
-        if (!_tmp)                                                         \
-            break;                                                         \
-        (v) = _tmp; /* Resize if needed */                                 \
-        size_t _len;                                                       \
-        vector_get_len(v, &_len);                                          \
-        (v)[_len++] = (item);                                              \
-        internal_vector_set_len(v, _len);                                           \
-    } while (0)
+
+#define vector_push_back(v, item) internal_vector_push_back(v, item)
 
 /**
  * @brief
@@ -182,20 +156,7 @@ const char *vector_status_to_string(VectorStatus status);
  * @param source Source array, can be value type array i.e. {1, 2, 3}.
  * @param len Length of source array.
  */
-#define vector_push_many(v, source, len)                            \
-    do                                                              \
-    {                                                               \
-        if (!(v))                                                   \
-        {                                                           \
-            VECTOR_DEBUG_PERROR("Vector Push Many: given null.\n"); \
-            break;                                                  \
-        }                                                           \
-        size_t _vi;                                                 \
-        for (_vi = 0; _vi < (size_t)(len); _vi++)                   \
-        {                                                           \
-            vector_push_back((v), (source)[_vi]);                   \
-        }                                                           \
-    } while (0)
+#define vector_push_many(v, source, len) internal_vector_push_many(v, source, len)
 
 /**
  * @brief Push an item onto the end of the vector.
@@ -206,24 +167,13 @@ const char *vector_status_to_string(VectorStatus status);
  * @param index Index to insert item to.
  * @param item Item to push.
  */
-#define vector_insert(v, index, item)                                            \
-    do                                                                           \
-    {                                                                            \
-        void *_tmp = internal_vector_prepare_insert((v), sizeof(*(v)), (index)); \
-        if (!_tmp)                                                               \
-            break;                                                               \
-        (v) = _tmp;                                                              \
-        (v)[(index)] = (item);                                                   \
-        size_t _len;                                                             \
-        vector_get_len(v, &_len);                                                \
-        internal_vector_set_len(v, _len + 1);                                             \
-    } while (0)
+#define vector_insert(v, index, item) internal_vector_insert(v, index, item)
 
 /**
  * @brief Shrinks the capacity of the vector to fit its current length.
  *
  * This releases any unused memory beyond the current number of elements.
- * 
+ *
  * @param v Vector pointer (will be reassigned).
  * @return The shrunk vector pointer (same as v), or NULL on failure.
  */
@@ -276,10 +226,68 @@ const char *vector_status_to_string(VectorStatus status);
          ++_i)
 
 /* Internal methdods */
+
+#ifdef VECTOR_DEBUG
+#include <stdio.h>
+#define VECTOR_DEBUG_PERROR(string) perror(string)
+#define VECTOR_VALIDATE(v)                                                          \
+    do                                                                              \
+    {                                                                               \
+        if (((uintptr_t)(v)) % sizeof(void *) != 0)                                 \
+        {                                                                           \
+            VECTOR_DEBUG_PERROR("Vector Validate: vector not properly aligned.\n"); \
+        }                                                                           \
+    } while (0)
+#else
+#define VECTOR_DEBUG_PERROR(string)
+#define VECTOR_VALIDATE(v)
+#endif
+
 void *internal_vector_prepare_push_back(void *vptr, size_t item_size);
 
 void *internal_vector_prepare_insert(void *vptr, size_t item_size, size_t index);
 
-VectorStatus internal_vector_set_len(void *vector, size_t len);
+void internal_vector_set_len(void *vector, size_t len);
+
+#define internal_vector_push_back(v, item)                                 \
+    do                                                                     \
+    {                                                                      \
+        void *_tmp = internal_vector_prepare_push_back((v), sizeof(*(v))); \
+        if (!_tmp)                                                         \
+            break;                                                         \
+        (v) = _tmp; /* Resize if needed */                                 \
+        size_t _len;                                                       \
+        vector_get_len(v, &_len);                                          \
+        (v)[_len++] = (item);                                              \
+        internal_vector_set_len(v, _len);                                  \
+    } while (0)
+
+#define internal_vector_push_many(v, source, len)                   \
+    do                                                              \
+    {                                                               \
+        if (!(v))                                                   \
+        {                                                           \
+            VECTOR_DEBUG_PERROR("Vector Push Many: given null.\n"); \
+            break;                                                  \
+        }                                                           \
+        size_t _vi;                                                 \
+        for (_vi = 0; _vi < (size_t)(len); _vi++)                   \
+        {                                                           \
+            vector_push_back((v), (source)[_vi]);                   \
+        }                                                           \
+    } while (0)
+
+#define internal_vector_insert(v, index, item)                                   \
+    do                                                                           \
+    {                                                                            \
+        void *_tmp = internal_vector_prepare_insert((v), sizeof(*(v)), (index)); \
+        if (!_tmp)                                                               \
+            break;                                                               \
+        (v) = _tmp;                                                              \
+        (v)[(index)] = (item);                                                   \
+        size_t _len;                                                             \
+        vector_get_len(v, &_len);                                                \
+        internal_vector_set_len(v, _len + 1);                                    \
+    } while (0)
 
 #endif /* _VECTOR_H */

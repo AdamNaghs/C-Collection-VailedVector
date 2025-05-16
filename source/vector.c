@@ -332,14 +332,13 @@ void *internal_vector_prepare_insert(void *vptr, size_t item_size, size_t index)
 }
 
 /* Set vector length (no bounds check) */
-VectorStatus internal_vector_set_len(void *vector, size_t len)
+void internal_vector_set_len(void *vector, size_t len)
 {
     if (!vector)
     {
         VECTOR_DEBUG_PERROR("Vector Set Len: given null vector.\n");
-        return VEC_ERR;
+        return;
     }
     VectorHeader *hdr = VECTOR_HEADER(vector);
     hdr->len = len;
-    return VEC_OK;
 }

@@ -146,7 +146,6 @@ const char *vector_status_to_string(VectorStatus status);
  * @param v Vector pointer.
  * @param item Item to push.
  */
-
 #define vector_push_back(v, item) internal_vector_push_back(v, item)
 
 /**

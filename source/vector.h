@@ -195,7 +195,7 @@ const char *vector_status_to_string(VectorStatus status);
  * }
  * @endcode
  */
-#define vector_foreach(_i,v, var)                                                                                      \
+#define vector_foreach(_i, v, var)                                                                                  \
     for (size_t _i = 0, _len = 0;                                                                                   \
          (v) && ((_i < (_len == 0 && vector_get_len((v), &_len) == VEC_OK ? _len : _len)) && ((var) = (v)[_i], 1)); \
          ++_i)

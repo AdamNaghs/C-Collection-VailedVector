@@ -6,42 +6,42 @@ typedef struct
     size_t cap;   /* total capacity */
     size_t len;   /* current length */
     size_t tsize; /* type size*/
-    Allocator *a; /* allocator pointer */
-} VectorHeader;
+    allocator_t *a; /* allocator pointer */
+} vector_header_t;
 
 typedef unsigned char byte_t;
 
-#define VECTOR_HEADER(vector) ((VectorHeader *)((byte_t *)vector - sizeof(VectorHeader)))
+#define VECTOR_HEADER(vector) ((vector_header_t *)((byte_t *)vector - sizeof(vector_header_t)))
 
 /* Initialize a new vector */
-void *vector_init(size_t tsize, size_t cap, Allocator *a)
+void *vector_init(size_t tsize, size_t cap, allocator_t *a)
 {
     if (!a)
     {
         VECTOR_DEBUG_PERROR("Vector Init: given null allocator.\n");
         return NULL;
     }
-    VectorHeader h = {cap, 0, tsize, a};
+    vector_header_t h = {cap, 0, tsize, a};
     void *ret = a->malloc(sizeof(h) + tsize * cap);
     if (!ret)
     {
         VECTOR_DEBUG_PERROR("Vector Init: allocation failed.\n");
         return NULL;
     }
-    VectorHeader *hdr = ret;
+    vector_header_t *hdr = ret;
     *hdr = h;
     return (byte_t *)ret + sizeof(h);
 }
 
 /* Free a vector */
-VectorStatus vector_free(void *vector)
+vector_status_t vector_free(void *vector)
 {
     if (!vector)
     {
         VECTOR_DEBUG_PERROR("Vector Free: given null vector.\n");
         return VEC_ERR;
     }
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
     if (!hdr->a)
     {
         VECTOR_DEBUG_PERROR("Vector Free: null allocator in header.\n");
@@ -52,19 +52,19 @@ VectorStatus vector_free(void *vector)
 }
 
 /* Check if vector can append */
-VectorStatus vector_can_append(void *vector)
+vector_status_t vector_can_append(void *vector)
 {
     if (!vector)
     {
         VECTOR_DEBUG_PERROR("Vector Can Append: given null vector.\n");
         return VEC_ERR;
     }
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
     return (hdr->cap > hdr->len) ? VEC_OK : VEC_FULL;
 }
 
 /* Get vector capacity */
-VectorStatus vector_get_cap(void *vector, size_t *out)
+vector_status_t vector_get_cap(void *vector, size_t *out)
 {
     if (!vector)
     {
@@ -76,13 +76,13 @@ VectorStatus vector_get_cap(void *vector, size_t *out)
         VECTOR_DEBUG_PERROR("Vector Get Cap: given null output pointer.\n");
         return VEC_ERR;
     }
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
     *out = hdr->cap;
     return VEC_OK;
 }
 
 /* Get vector length */
-VectorStatus vector_get_len(void *vector, size_t *out)
+vector_status_t vector_get_len(void *vector, size_t *out)
 {
     if (!vector)
     {
@@ -94,20 +94,20 @@ VectorStatus vector_get_len(void *vector, size_t *out)
         VECTOR_DEBUG_PERROR("Vector Get Len: given null output pointer.\n");
         return VEC_ERR;
     }
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
     *out = hdr->len;
     return VEC_OK;
 }
 
 /* Unordered remove */
-VectorStatus vector_remove(void *vector, size_t index)
+vector_status_t vector_remove(void *vector, size_t index)
 {
     if (!vector)
     {
         VECTOR_DEBUG_PERROR("Vector Remove: given null vector.\n");
         return VEC_ERR;
     }
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
 
     if (index >= hdr->len)
     {
@@ -128,7 +128,7 @@ VectorStatus vector_remove(void *vector, size_t index)
 }
 
 /* Respects order */
-VectorStatus vector_remove_ordered(void *vector, size_t index)
+vector_status_t vector_remove_ordered(void *vector, size_t index)
 {
     if (!vector)
     {
@@ -136,7 +136,7 @@ VectorStatus vector_remove_ordered(void *vector, size_t index)
         return VEC_ERR;
     }
 
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
     if (index >= hdr->len)
     {
         VECTOR_DEBUG_PERROR("Vector Remove Ordered: index out of bounds.\n");
@@ -162,7 +162,7 @@ void *vector_shrink_to_fit(void *vector)
         return NULL;
     }
 
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
 
     void *new_vec = vector_resize(vector, hdr->len);
     if (!new_vec)
@@ -187,7 +187,7 @@ void *vector_normal_copy(void *vector, void *(*malloc_fn)(size_t))
         return NULL;
     }
 
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
 
     size_t total_size = hdr->len * hdr->tsize;
     if (total_size == 0)
@@ -212,13 +212,13 @@ void *vector_resize(void *vector, size_t cap)
         VECTOR_DEBUG_PERROR("Vector Resize: given null vector.\n");
         return NULL;
     }
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
     if (!hdr->a)
     {
         VECTOR_DEBUG_PERROR("Vector Resize: null allocator in header.\n");
         return NULL;
     }
-    VectorHeader *new_vector = hdr->a->realloc(hdr, cap * hdr->tsize + sizeof(VectorHeader));
+    vector_header_t *new_vector = hdr->a->realloc(hdr, cap * hdr->tsize + sizeof(vector_header_t));
     if (!new_vector)
     {
         VECTOR_DEBUG_PERROR("Vector Resize: realloc failed.\n");
@@ -227,18 +227,18 @@ void *vector_resize(void *vector, size_t cap)
     new_vector->cap = cap;
     if (new_vector->len > cap)
         new_vector->len = cap;
-    return (byte_t *)new_vector + sizeof(VectorHeader);
+    return (byte_t *)new_vector + sizeof(vector_header_t);
 }
 
 /* Pop back: reduce length and return pointer to popped item */
-VectorStatus vector_pop_back(void *vector, void *out)
+vector_status_t vector_pop_back(void *vector, void *out)
 {
     if (!vector || !out)
     {
         VECTOR_DEBUG_PERROR("Vector Pop Back: given null vector or out.\n");
         return VEC_ERR;
     }
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
     if (hdr->len == 0)
     {
         VECTOR_DEBUG_PERROR("Vector Pop Back: empty vector.\n");
@@ -249,7 +249,7 @@ VectorStatus vector_pop_back(void *vector, void *out)
     return VEC_OK;
 }
 
-const char *vector_status_to_string(VectorStatus status)
+const char *vector_status_to_string(vector_status_t status)
 {
     switch (status)
     {
@@ -339,6 +339,6 @@ void internal_vector_set_len(void *vector, size_t len)
         VECTOR_DEBUG_PERROR("Vector Set Len: given null vector.\n");
         return;
     }
-    VectorHeader *hdr = VECTOR_HEADER(vector);
+    vector_header_t *hdr = VECTOR_HEADER(vector);
     hdr->len = len;
 }

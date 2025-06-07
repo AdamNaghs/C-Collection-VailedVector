@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 
-Allocator a = {malloc,realloc,free};
+allocator_t a = {malloc,realloc,free};
 
 TEST_MAKE(InitFree)
 {

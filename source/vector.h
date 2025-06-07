@@ -13,23 +13,23 @@ typedef enum
     VEC_FULL,
     VEC_EMPTY,
     VEC_INDEX_OOB
-} VectorStatus;
+} vector_status_t;
 
 /**
  * @brief Allocator interface for the vector system.
  */
-typedef struct Allocator
+typedef struct allocator_t
 {
     void *(*malloc)(size_t);          /**< Function to allocate memory. */
     void *(*realloc)(void *, size_t); /**< Function to reallocate memory. */
     void (*free)(void *);             /**< Function to free memory. */
-} Allocator;
+} allocator_t;
 
 /**
  * @brief Create a new vector of type T using a specified allocator.
  *
  * @param T Type of the elements.
- * @param a Pointer to Allocator.
+ * @param a Pointer to allocator_t.
  * @return T* Pointer to the start of the vector's elements.
  */
 #define vector(T, a) (T *)vector_init(sizeof(T), VECTOR_DEFAULT_CAP, a)
@@ -39,10 +39,10 @@ typedef struct Allocator
  *
  * @param tsize Size of each element (sizeof(T)).
  * @param cap Initial capacity.
- * @param a Pointer to Allocator.
+ * @param a Pointer to allocator_t.
  * @return void* Pointer to elements on success, NULL on failure.
  */
-void *vector_init(size_t tsize, size_t cap, Allocator *a);
+void *vector_init(size_t tsize, size_t cap, allocator_t *a);
 
 /**
  * @brief Free a vector.
@@ -50,7 +50,7 @@ void *vector_init(size_t tsize, size_t cap, Allocator *a);
  * @param vector Vector pointer.
  * @return VEC_OK on success, VEC_ERR on error
  */
-VectorStatus vector_free(void *vector);
+vector_status_t vector_free(void *vector);
 
 /**
  * @brief Check if a vector can append without resizing.
@@ -58,7 +58,7 @@ VectorStatus vector_free(void *vector);
  * @param vector Vector pointer.
  * @return VEC_OK if vector can append, VEC_FULL if full, VEC_ERR on error.
  */
-VectorStatus vector_can_append(void *vector);
+vector_status_t vector_can_append(void *vector);
 
 /**
  * @brief Get the current capacity of the vector.
@@ -67,7 +67,7 @@ VectorStatus vector_can_append(void *vector);
  * @param out Pointer to size_t where the capacity will be written.
  * @return VEC_OK on success, VEC_ERR on error
  */
-VectorStatus vector_get_cap(void *vector, size_t *out);
+vector_status_t vector_get_cap(void *vector, size_t *out);
 
 /**
  * @brief Get the current length (number of elements) of the vector.
@@ -76,7 +76,7 @@ VectorStatus vector_get_cap(void *vector, size_t *out);
  * @param out Pointer to size_t where the length will be written.
  * @return VEC_OK on success, VEC_ERR on error
  */
-VectorStatus vector_get_len(void *vector, size_t *out);
+vector_status_t vector_get_len(void *vector, size_t *out);
 
 /**
  * @brief Remove index from vector. Doesn't respect order.
@@ -85,7 +85,7 @@ VectorStatus vector_get_len(void *vector, size_t *out);
  * @param index Index to be removed.
  * @return VEC_OK on success, VEC_INDEX_OOB if index is out of bounds, VEC_ERR on error
  */
-VectorStatus vector_remove(void *vector, size_t index);
+vector_status_t vector_remove(void *vector, size_t index);
 
 /**
  * @brief Remove index from vector. Respects order.
@@ -94,7 +94,7 @@ VectorStatus vector_remove(void *vector, size_t index);
  * @param index Index to be removed.
  * @return VEC_OK on success, VEC_INDEX_OOB if index is out of bounds, VEC_ERR on error
  */
-VectorStatus vector_remove_ordered(void *vector, size_t index);
+vector_status_t vector_remove_ordered(void *vector, size_t index);
 
 /**
  * @brief Copies removes last value from vector and copies it to out.
@@ -102,7 +102,7 @@ VectorStatus vector_remove_ordered(void *vector, size_t index);
  * @param vector Vector pointer
  * @param out Reference to copy pop value to.
  */
-VectorStatus vector_pop_back(void *vector, void *out);
+vector_status_t vector_pop_back(void *vector, void *out);
 
 /**
  * @brief Copies the vector contents into a normal C array (no header).
@@ -136,7 +136,7 @@ void *vector_shrink_to_fit(void *vector_ptr);
  * @param status Vector function return code
  * @return const char*
  */
-const char *vector_status_to_string(VectorStatus status);
+const char *vector_status_to_string(vector_status_t status);
 
 /**
  * @brief Push an item onto the end of the vector.

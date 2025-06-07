@@ -8,7 +8,7 @@
 
 int test_init_free(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
     int *vec = vector(int, &a);
     if (!vec)
         return 1;
@@ -20,7 +20,7 @@ int test_init_free(void)
 
 int test_append(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
     int *vec = vector(int, &a);
     if (!vec)
         return 1;
@@ -48,7 +48,7 @@ int test_append(void)
 
 int test_pop_back(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
     int *vec = vector(int, &a);
     if (!vec)
         return 1;
@@ -82,7 +82,7 @@ int test_pop_back(void)
 
 int test_resize(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
     int *vec = vector(int, &a);
     if (!vec)
         return 1;
@@ -110,7 +110,7 @@ int test_resize(void)
 
 int test_can_append(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
     int *vec = vector(int, &a);
     if (!vec)
         return 1;
@@ -136,7 +136,7 @@ int test_can_append(void)
 
 int test_get_cap(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
     int *vec = vector(int, &a);
     if (!vec)
         return 1;
@@ -153,7 +153,7 @@ int test_get_cap(void)
 
 int test_remove(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
     int *vec = vector(int, &a);
     if (!vec)
         return 1;
@@ -196,7 +196,7 @@ int test_remove(void)
 
 int test_remove_ordered(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
     int *vec = vector(int, &a);
     if (!vec)
         return 1;
@@ -225,7 +225,7 @@ int test_remove_ordered(void)
 
 int test_vector_of_dyn(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
 
     typedef int *IntVector;
     IntVector *vec = vector(IntVector, &a);
@@ -276,7 +276,7 @@ int test_vector_of_dyn(void)
 
 int test_vector_of_vectors(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
 
     typedef int *IntVector;
     IntVector *vec = vector(IntVector, &a);
@@ -337,7 +337,7 @@ int test_vector_of_vectors(void)
 
 int test_insert(void)
 {
-    Allocator a = {malloc, realloc, free};
+    allocator_t a = {malloc, realloc, free};
     int *vec = vector(int, &a);
     if (!vec)
         return 1;
